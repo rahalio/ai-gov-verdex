@@ -1,0 +1,776 @@
+openapi: 3.0.3
+info:
+  title: Verdex
+  version: 0.1.0
+  description: Investor- and board-grade AI capability diligence. Scores real versus snake-oil AI claims
+    across data network effects, proprietary algorithms, talent retention, and path-to-performance, with
+    challengeable grades and memo-ready packs.
+  x-product-slug: ai-gov-verdex
+  x-source: ai-in-gov/APPGAI_Theme Report 4/
+servers:
+- url: https://api.example.com
+tags:
+- name: Engagements
+  description: Diligence engagements and sector context
+- name: Factors
+  description: Capability factor scores
+- name: Evidence
+  description: Evidence artefacts bound to factors
+- name: Grades
+  description: Published capability bands
+- name: Challenges
+  description: Challenge reviews of grades
+- name: Packs
+  description: IC and board diligence packs
+- name: Monitoring
+  description: Post-investment capability drift signals
+paths:
+  /v1/engagements:
+    get:
+      operationId: listDiligenceEngagements
+      tags:
+      - Engagements
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeDiligenceEngagement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createDiligenceEngagement
+      tags:
+      - Engagements
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiligenceEngagementCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeDiligenceEngagement'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/engagements/{engagementId}:
+    parameters:
+    - $ref: '#/components/parameters/EngagementId'
+    get:
+      operationId: getDiligenceEngagement
+      tags:
+      - Engagements
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeDiligenceEngagement'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/engagements/{engagementId}/factor-scores:
+    parameters:
+    - $ref: '#/components/parameters/EngagementId'
+    get:
+      operationId: listFactorScores
+      tags:
+      - Factors
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeFactorScore'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createFactorScore
+      tags:
+      - Factors
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactorScoreCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeFactorScore'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/engagements/{engagementId}/evidence:
+    parameters:
+    - $ref: '#/components/parameters/EngagementId'
+    get:
+      operationId: listEvidenceArtefacts
+      tags:
+      - Evidence
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeEvidenceArtefact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createEvidenceArtefact
+      tags:
+      - Evidence
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvidenceArtefactCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeEvidenceArtefact'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/engagements/{engagementId}/grades:
+    parameters:
+    - $ref: '#/components/parameters/EngagementId'
+    post:
+      operationId: publishCapabilityGrade
+      tags:
+      - Grades
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilityGradePublish'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeCapabilityGrade'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+    get:
+      operationId: listCapabilityGrades
+      tags:
+      - Grades
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeCapabilityGrade'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/grades/{gradeId}/challenges:
+    parameters:
+    - $ref: '#/components/parameters/GradeId'
+    post:
+      operationId: openChallengeReview
+      tags:
+      - Challenges
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChallengeReviewCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeChallengeReview'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/engagements/{engagementId}/packs:
+    parameters:
+    - $ref: '#/components/parameters/EngagementId'
+    post:
+      operationId: exportDiligencePack
+      tags:
+      - Packs
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeDiligencePack'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/monitoring/signals:
+    get:
+      operationId: listPortfolioMonitorSignals
+      tags:
+      - Monitoring
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopePortfolioMonitorSignal'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+    EngagementId:
+      name: engagementId
+      in: path
+      required: true
+      schema:
+        type: string
+    GradeId:
+      name: gradeId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    ResponseMeta:
+      type: object
+      required:
+      - requestId
+      - timestamp
+      properties:
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required:
+      - type
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    DiligenceEngagement:
+      type: object
+      properties:
+        id:
+          type: string
+        companyName:
+          type: string
+        sectorAdoption:
+          type: string
+          enum:
+          - high
+          - medium
+          - low
+        status:
+          type: string
+          enum:
+          - open
+          - scoring
+          - published
+          - closed
+      required:
+      - id
+      - companyName
+      - sectorAdoption
+      - status
+    FactorScore:
+      type: object
+      properties:
+        id:
+          type: string
+        engagementId:
+          type: string
+        factorKey:
+          type: string
+        score:
+          type: number
+        provisional:
+          type: boolean
+        nonMlFlag:
+          type: boolean
+      required:
+      - id
+      - engagementId
+      - factorKey
+      - score
+    EvidenceArtefact:
+      type: object
+      properties:
+        id:
+          type: string
+        engagementId:
+          type: string
+        artefactType:
+          type: string
+        factorKey:
+          type: string
+        uri:
+          type: string
+      required:
+      - id
+      - engagementId
+      - artefactType
+    CapabilityGrade:
+      type: object
+      properties:
+        id:
+          type: string
+        engagementId:
+          type: string
+        band:
+          type: string
+          enum:
+          - none
+          - basic
+          - advanced
+        publishedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+      required:
+      - id
+      - engagementId
+      - band
+    ChallengeReview:
+      type: object
+      properties:
+        id:
+          type: string
+        gradeId:
+          type: string
+        status:
+          type: string
+          enum:
+          - open
+          - upheld
+          - revised
+        basis:
+          type: string
+      required:
+      - id
+      - gradeId
+      - status
+    DiligencePack:
+      type: object
+      properties:
+        id:
+          type: string
+        engagementId:
+          type: string
+        facts:
+          type: array
+          items:
+            type: string
+        judgements:
+          type: array
+          items:
+            type: string
+        unknowns:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - engagementId
+    PortfolioMonitorSignal:
+      type: object
+      properties:
+        id:
+          type: string
+        engagementId:
+          type: string
+        signalType:
+          type: string
+          enum:
+          - talent_drift
+          - data_licence_expiry
+          - other
+        severity:
+          type: string
+      required:
+      - id
+      - engagementId
+      - signalType
+    DiligenceEngagementCreate:
+      type: object
+      required:
+      - companyName
+      - sectorAdoption
+      properties:
+        companyName:
+          type: string
+        sectorAdoption:
+          type: string
+          enum:
+          - high
+          - medium
+          - low
+        productLine:
+          type: string
+    FactorScoreCreate:
+      type: object
+      required:
+      - factorKey
+      - score
+      properties:
+        factorKey:
+          type: string
+        score:
+          type: number
+        rationale:
+          type: string
+        nonMlFlag:
+          type: boolean
+    EvidenceArtefactCreate:
+      type: object
+      required:
+      - artefactType
+      - factorKey
+      properties:
+        artefactType:
+          type: string
+        factorKey:
+          type: string
+        uri:
+          type: string
+        summary:
+          type: string
+    CapabilityGradePublish:
+      type: object
+      required:
+      - band
+      properties:
+        band:
+          type: string
+          enum:
+          - none
+          - basic
+          - advanced
+        expiresAt:
+          type: string
+          format: date-time
+    ChallengeReviewCreate:
+      type: object
+      required:
+      - basis
+      properties:
+        basis:
+          type: string
+        evidenceUri:
+          type: string
+    DataEnvelopeDiligenceEngagement:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/DiligenceEngagement'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeDiligenceEngagement:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/DiligenceEngagement'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeFactorScore:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/FactorScore'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeFactorScore:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/FactorScore'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeEvidenceArtefact:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/EvidenceArtefact'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeEvidenceArtefact:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/EvidenceArtefact'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeCapabilityGrade:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/CapabilityGrade'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeCapabilityGrade:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CapabilityGrade'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeChallengeReview:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/ChallengeReview'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeChallengeReview:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChallengeReview'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeDiligencePack:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/DiligencePack'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeDiligencePack:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/DiligencePack'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopePortfolioMonitorSignal:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/PortfolioMonitorSignal'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopePortfolioMonitorSignal:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortfolioMonitorSignal'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
